@@ -6,6 +6,8 @@ package cmd
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"os"
 	"time"
 
@@ -39,6 +41,16 @@ var listWorkspaceCommand = &cobra.Command{
 		workspaces, err := gitpod.Workspaces.ListWorkspaces(ctx, connect.NewRequest(&v1.ListWorkspacesRequest{}))
 		if err != nil {
 			return err
+		}
+
+		if JsonOutput {
+			workspaceJSON, err := json.Marshal(workspaces.Msg.GetResult())
+			if err != nil {
+				fmt.Println(err)
+				return err
+			}
+			fmt.Println(string(workspaceJSON))
+			return nil
 		}
 
 		table := tablewriter.NewWriter(os.Stdout)

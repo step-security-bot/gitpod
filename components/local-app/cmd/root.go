@@ -10,6 +10,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var JsonOutput bool
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "gitpod",
@@ -27,4 +29,5 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().BoolVarP(&JsonOutput, "json", "j", false, "When applicable, output in JSON format")
 }

@@ -45,7 +45,7 @@ The command works with a Gitpod host that can be specified in the configuration 
 		_, cancel := context.WithTimeout(cmd.Context(), 5*time.Second)
 		defer cancel()
 
-		repo, err := git.PlainOpen(folder) // open the repo in the specified directory
+		repo, err := git.PlainOpenWithOptions(folder, &git.PlainOpenOptions{DetectDotGit: true}) // open the repo in the specified directory
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -57,9 +57,7 @@ The command works with a Gitpod host that can be specified in the configuration 
 
 		var urls []string
 		for _, remote := range remotes {
-			for _, url := range remote.Config().URLs {
-				urls = append(urls, url)
-			}
+			urls = append(urls, remote.Config().URLs...)
 		}
 
 		var repoURL string
@@ -94,6 +92,12 @@ The command works with a Gitpod host that can be specified in the configuration 
 		}
 		u.Fragment = repoURL
 		safeURL := u.String()
+
+		if JsonOutput {
+			jsonContent := fmt.Sprintf(`{"url": "%s"}`, safeURL)
+			fmt.Println(jsonContent)
+			return nil
+		}
 
 		fmt.Println("Opening URL:", safeURL)
 
