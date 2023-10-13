@@ -2,17 +2,17 @@
 // Licensed under the GNU Affero General Public License (AGPL).
 // See License.AGPL.txt in the project root for license information.
 
-package main
+package cmd
 
 import (
-	"github.com/gitpod-io/gitpod-local-cli/cmd"
+	"github.com/spf13/cobra"
 )
 
-var (
-	// Version - set during build
-	Version = "dev"
-)
+var wsCmd = &cobra.Command{
+	Use:   "workspace",
+	Short: "Interact with workspaces",
+}
 
-func main() {
-	cmd.Execute()
+func init() {
+	rootCmd.AddCommand(wsCmd)
 }
