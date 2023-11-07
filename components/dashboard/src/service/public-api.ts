@@ -46,6 +46,9 @@ export const organizationClient = createServiceClient(
     "organization",
 );
 
+// @ts-ignore
+window.$workspaceClient = workspaceClient;
+
 export async function listAllProjects(opts: { orgId: string }): Promise<ProtocolProject[]> {
     let pagination = {
         page: 1,

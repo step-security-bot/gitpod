@@ -951,7 +951,7 @@ export class GitpodServerImpl implements GitpodServerWithTracing, Disposable {
 
         const user = await this.checkUser("getWorkspaces");
 
-        const result = await this.workspaceService.getWorkspaces(user.id, options);
+        const result = (await this.workspaceService.getWorkspaces(user.id, options)).rows;
         await Promise.all(result.map((ws) => this.guardAccess({ kind: "workspace", subject: ws.workspace }, "get")));
         await Promise.all(
             result.map((ws) =>

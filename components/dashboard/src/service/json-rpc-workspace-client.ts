@@ -12,9 +12,13 @@ import {
     GetWorkspaceResponse,
     WatchWorkspaceStatusRequest,
     WatchWorkspaceStatusResponse,
+    ListWorkspacesRequest,
+    ListWorkspacesRequest_Scope,
+    ListWorkspacesResponse,
 } from "@gitpod/public-api/lib/gitpod/v1/workspace_pb";
 import { converter } from "./public-api";
 import { getGitpodService } from "./service";
+import { PaginationResponse } from "@gitpod/public-api/lib/gitpod/v1/pagination_pb";
 import { generateAsyncGenerator } from "@gitpod/gitpod-protocol/lib/generate-async-generator";
 import { WorkspaceInstance } from "@gitpod/gitpod-protocol";
 
@@ -79,5 +83,31 @@ export class JsonRpcWorkspaceClient implements PromiseClient<typeof WorkspaceSer
             response.status = status;
             yield response;
         }
+    }
+
+    async listWorkspaces(
+        request: PartialMessage<ListWorkspacesRequest>,
+        _options?: CallOptions,
+    ): Promise<ListWorkspacesResponse> {
+        request.scope = request.scope ?? ListWorkspacesRequest_Scope.MY_WORKSPACES_IN_ORGANIZATION;
+        if (
+            request.scope === ListWorkspacesRequest_Scope.MY_WORKSPACES_IN_ORGANIZATION ||
+            request.scope === ListWorkspacesRequest_Scope.ALL_WORKSPACES_IN_ORGANIZATION
+        ) {
+            throw new ConnectError("organization_id is required", Code.InvalidArgument);
+        }
+        const server = getGitpodService().server;
+        const pageSize = request.pagination?.pageSize || 100;
+        const workspaces = await server.getWorkspaces({
+            organizationId: request.organizationId,
+            pinnedOnly: request.pinned === true ? true : undefined,
+            limit: pageSize,
+            offset: (request.pagination?.page ?? 0) * pageSize,
+        });
+        const response = new ListWorkspacesResponse();
+        response.workspaces = workspaces.map((info) => converter.toWorkspace(info));
+        response.pagination = new PaginationResponse();
+        response.pagination.total = workspaces.length;
+        return response;
     }
 }

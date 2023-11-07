@@ -408,6 +408,7 @@ export interface StartWorkspaceResult {
 export namespace GitpodServer {
     export interface GetWorkspacesOptions {
         limit?: number;
+        offset?: number;
         searchString?: string;
         pinnedOnly?: boolean;
         projectId?: string | string[];

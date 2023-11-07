@@ -3,6 +3,8 @@ syntax = "proto3";
 package gitpod.v1;
 
 import "google/protobuf/timestamp.proto";
+import "gitpod/v1/pagination.proto";
+import "gitpod/v1/sort.proto";
 
 option go_package = "github.com/gitpod-io/gitpod/components/public-api/go/v1";
 
@@ -17,6 +19,9 @@ service WorkspaceService {
   //
   // workspace_id +return NOT_FOUND Workspace does not exist
   rpc WatchWorkspaceStatus(WatchWorkspaceStatusRequest) returns (stream WatchWorkspaceStatusResponse) {}
+
+  // ListWorkspaces returns a list of workspaces that match the query.
+  rpc ListWorkspaces(ListWorkspacesRequest) returns (ListWorkspacesResponse) {}
 }
 
 message GetWorkspaceRequest { string id = 1; }
@@ -36,6 +41,55 @@ message WatchWorkspaceStatusResponse {
 
   // status is the updated status of workspace
   WorkspaceStatus status = 2;
+}
+
+message ListWorkspacesRequest {
+  // pagination contains the pagination options for listing workspaces
+  PaginationRequest pagination = 1;
+
+  repeated WorkspaceSortRequest sorts = 2;
+
+  // scope of the workspaces
+  Scope scope = 3;
+
+  enum Scope {
+    SCOPE_UNSPECIFIED = 0;
+
+    // SCOPE_MY_WORKSPACES_IN_ORGANIZATION scopes workspaces that is owned by current user in the organization
+    SCOPE_MY_WORKSPACES_IN_ORGANIZATION = 1;
+
+    // SCOPE_ALL_WORKSPACES_IN_ORGANIZATION scopes all workspaces in the organization
+    SCOPE_ALL_WORKSPACES_IN_ORGANIZATION = 2;
+
+    // SCOPE_ALL_WORKSPACES_IN_INSTALLATION scopes all workspaces in the installation
+    SCOPE_ALL_WORKSPACES_IN_INSTALLATION = 3;
+  }
+
+  // organization_id is the ID of the organization that contains the workspaces
+  string organization_id = 4;
+
+  // pinned indicates whether to list only pinned workspaces
+  bool pinned = 5;
+
+  // search_term is a search term to filter workspaces by name
+  string search_term = 6;
+}
+
+message ListWorkspacesResponse {
+  // workspaces are the workspaces that matched the query
+  repeated Workspace workspaces = 1;
+
+  // pagination contains the pagination options for listing workspaces
+  PaginationResponse pagination = 2;
+}
+
+enum WorkspaceSortableField {
+  WORKSPACE_SORTABLE_FIELD_UNSPECIFIED = 0;
+}
+
+message WorkspaceSortRequest {
+  WorkspaceSortableField field = 1;
+  SortOrder order = 2;
 }
 
 // +resource get workspace

@@ -177,7 +177,7 @@ export class TypeORMWorkspaceDBImpl extends TransactionalDBImpl<WorkspaceDB> imp
         return this.findById(instance.workspaceId);
     }
 
-    public async find(options: FindWorkspacesOptions): Promise<WorkspaceInfo[]> {
+    public async find(options: FindWorkspacesOptions): Promise<{ total: number; rows: WorkspaceInfo[] }> {
         /**
          * With this query we want to list all user workspaces by lastActivity and include the latestWorkspaceInstance (if present).
          * Implementation notes:
@@ -233,7 +233,7 @@ export class TypeORMWorkspaceDBImpl extends TransactionalDBImpl<WorkspaceDB> imp
         if (projectIds !== undefined) {
             if (projectIds.length === 0 && !options.includeWithoutProject) {
                 // user passed an empty array of projectids and also is not interested in unassigned workspaces -> no results
-                return [];
+                return { total: 0, rows: [] };
             }
             qb.andWhere(
                 new Brackets((qb) => {
@@ -251,8 +251,8 @@ export class TypeORMWorkspaceDBImpl extends TransactionalDBImpl<WorkspaceDB> imp
                 }),
             );
         }
-        const rawResults = (await qb.getMany()) as any as (Workspace & { latestInstance?: WorkspaceInstance })[]; // see leftJoinAndMapOne above
-        return rawResults.map((r) => {
+        const [rawResults, total] = await qb.getManyAndCount();
+        const rows = (rawResults as any as (Workspace & { latestInstance?: WorkspaceInstance })[]).map((r) => {
             const workspace = { ...r };
             delete workspace.latestInstance;
             return {
@@ -260,6 +260,7 @@ export class TypeORMWorkspaceDBImpl extends TransactionalDBImpl<WorkspaceDB> imp
                 latestInstance: r.latestInstance,
             };
         });
+        return { total, rows };
     }
 
     public async updateLastHeartbeat(

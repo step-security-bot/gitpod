@@ -149,7 +149,7 @@ export class RelationshipUpdater {
             limit: 500, // The largest amount of workspaces is 189 today (2023-08-24)
         });
 
-        for (const ws of workspaces) {
+        for (const ws of workspaces.rows) {
             await this.authorizer.addWorkspaceToOrg(
                 ws.workspace.organizationId,
                 ws.workspace.ownerId,

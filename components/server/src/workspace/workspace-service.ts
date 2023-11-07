@@ -137,8 +137,11 @@ export class WorkspaceService {
         };
     }
 
-    async getWorkspaces(userId: string, options: GitpodServer.GetWorkspacesOptions): Promise<WorkspaceInfo[]> {
-        const res = await this.db.find({
+    async getWorkspaces(
+        userId: string,
+        options: GitpodServer.GetWorkspacesOptions,
+    ): Promise<{ total: number; rows: WorkspaceInfo[] }> {
+        const { total, rows } = await this.db.find({
             limit: 20,
             ...options,
             userId, // gpl: We probably want to removed this limitation in the future, butkeeping the old behavior for now due to focus on FGA
@@ -147,12 +150,12 @@ export class WorkspaceService {
 
         const filtered = (
             await Promise.all(
-                res.map(async (info) =>
+                rows.map(async (info) =>
                     (await this.auth.hasPermissionOnWorkspace(userId, "access", info.workspace.id)) ? info : undefined,
                 ),
             )
         ).filter((info) => !!info) as WorkspaceInfo[];
-        return filtered;
+        return { total, rows: filtered };
     }
 
     async getCurrentInstance(userId: string, workspaceId: string): Promise<WorkspaceInstance> {

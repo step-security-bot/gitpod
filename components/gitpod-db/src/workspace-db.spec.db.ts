@@ -415,9 +415,9 @@ class WorkspaceDBSpec {
         });
 
         // It should only find one workspace instance
-        expect(dbResult.length).to.eq(1);
+        expect(dbResult.total).to.eq(1);
 
-        expect(dbResult[0].workspace.id).to.eq(this.ws.id);
+        expect(dbResult.rows[0].workspace.id).to.eq(this.ws.id);
     }
 
     @test(timeout(10000))
@@ -437,9 +437,9 @@ class WorkspaceDBSpec {
         });
 
         // It should only find one workspace instance
-        expect(dbResult.length).to.eq(1);
+        expect(dbResult.total).to.eq(1);
 
-        expect(dbResult[0].workspace.id).to.eq(this.ws2.id);
+        expect(dbResult.rows[0].workspace.id).to.eq(this.ws2.id);
     }
 
     @test(timeout(10000))
@@ -458,10 +458,10 @@ class WorkspaceDBSpec {
             includeWithoutProject: false,
         });
 
-        expect(dbResult.length).to.eq(2);
+        expect(dbResult.total).to.eq(2);
 
-        expect(dbResult[0].workspace.id).to.eq(this.ws.id);
-        expect(dbResult[1].workspace.id).to.eq(this.ws2.id);
+        expect(dbResult.rows[0].workspace.id).to.eq(this.ws.id);
+        expect(dbResult.rows[1].workspace.id).to.eq(this.ws2.id);
     }
 
     @test(timeout(10000))
@@ -480,7 +480,7 @@ class WorkspaceDBSpec {
             includeWithoutProject: false,
         });
 
-        expect(dbResult.length).to.eq(0);
+        expect(dbResult.total).to.eq(0);
 
         // expect(dbResult[0].workspace.id).to.eq(this.ws.id);
         // expect(dbResult[1].workspace.id).to.eq(this.ws2.id);
@@ -504,9 +504,9 @@ class WorkspaceDBSpec {
             includeWithoutProject: true,
         });
 
-        expect(dbResult.length).to.eq(1);
+        expect(dbResult.total).to.eq(1);
 
-        expect(dbResult[0].workspace.id).to.eq(this.ws3.id);
+        expect(dbResult.rows[0].workspace.id).to.eq(this.ws3.id);
     }
 
     @test(timeout(10000))
@@ -527,10 +527,10 @@ class WorkspaceDBSpec {
             includeWithoutProject: true,
         });
 
-        expect(dbResult.length).to.eq(2);
+        expect(dbResult.total).to.eq(2);
 
-        expect(dbResult[0].workspace.id).to.eq(this.ws2.id);
-        expect(dbResult[1].workspace.id).to.eq(this.ws3.id);
+        expect(dbResult.rows[0].workspace.id).to.eq(this.ws2.id);
+        expect(dbResult.rows[1].workspace.id).to.eq(this.ws3.id);
     }
 
     @test(timeout(10000))
@@ -792,8 +792,8 @@ class WorkspaceDBSpec {
             organizationId: this.orgidA,
         });
 
-        expect(result.length).to.eq(2);
-        for (const ws of result) {
+        expect(result.total).to.eq(2);
+        for (const ws of result.rows) {
             expect(ws.workspace.organizationId).to.equal(this.orgidA);
         }
 
@@ -802,8 +802,8 @@ class WorkspaceDBSpec {
             organizationId: this.orgidB,
         });
 
-        expect(result.length).to.eq(1);
-        for (const ws of result) {
+        expect(result.total).to.eq(1);
+        for (const ws of result.rows) {
             expect(ws.workspace.organizationId).to.equal(this.orgidB);
         }
 
@@ -812,7 +812,7 @@ class WorkspaceDBSpec {
             organizationId: "no-org",
         });
 
-        expect(result.length).to.eq(0);
+        expect(result.total).to.eq(0);
     }
 
     @test(timeout(10000))

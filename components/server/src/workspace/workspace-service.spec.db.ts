@@ -211,13 +211,13 @@ describe("WorkspaceService", async () => {
         await createTestWorkspace(svc, org, owner, project);
 
         const ownerResult = await svc.getWorkspaces(owner.id, {});
-        expect(ownerResult).to.have.lengthOf(1);
+        expect(ownerResult.total).to.equal(1);
 
         const memberResult = await svc.getWorkspaces(member.id, {});
-        expect(memberResult).to.have.lengthOf(0);
+        expect(memberResult.total).to.equal(0);
 
         const strangerResult = await svc.getWorkspaces(stranger.id, {});
-        expect(strangerResult).to.have.lengthOf(0);
+        expect(strangerResult.total).to.equal(0);
     });
 
     it("should getWorkspaces - shared", async () => {
@@ -227,14 +227,14 @@ describe("WorkspaceService", async () => {
         await svc.controlAdmission(owner.id, ws.id, "everyone");
 
         const ownerResult = await svc.getWorkspaces(owner.id, {});
-        expect(ownerResult, "owner").to.have.lengthOf(1);
+        expect(ownerResult.total, "owner").to.equal(1);
 
         // getWorkspaces is limited to the user's own workspaces atm
         const memberResult = await svc.getWorkspaces(member.id, {});
-        expect(memberResult, "member").to.have.lengthOf(0);
+        expect(memberResult.total, "member").to.equal(0);
 
         const strangerResult = await svc.getWorkspaces(stranger.id, {});
-        expect(strangerResult, "stranger").to.have.lengthOf(0);
+        expect(strangerResult.total, "stranger").to.equal(0);
     });
 
     it("should getOwnerToken", async () => {

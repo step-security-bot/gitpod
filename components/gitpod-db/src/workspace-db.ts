@@ -32,6 +32,7 @@ export interface FindWorkspacesOptions {
     projectId?: string | string[];
     includeWithoutProject?: boolean;
     limit?: number;
+    offset?: number;
     searchString?: string;
     includeHeadless?: boolean;
     pinnedOnly?: boolean;
@@ -80,7 +81,7 @@ export interface WorkspaceDB {
     updatePartial(workspaceId: string, partial: DeepPartial<Workspace>): Promise<void>;
     findById(id: string): Promise<MaybeWorkspace>;
     findByInstanceId(id: string): Promise<MaybeWorkspace>;
-    find(options: FindWorkspacesOptions): Promise<WorkspaceInfo[]>;
+    find(options: FindWorkspacesOptions): Promise<{ total: number; rows: WorkspaceInfo[] }>;
     findWorkspacePortsAuthDataById(workspaceId: string): Promise<WorkspacePortsAuthData | undefined>;
 
     storeInstance(instance: WorkspaceInstance): Promise<WorkspaceInstance>;

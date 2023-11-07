@@ -11,6 +11,22 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, protoInt64, Timestamp } from "@bufbuild/protobuf";
+import { PaginationRequest, PaginationResponse } from "./pagination_pb.js";
+import { SortOrder } from "./sort_pb.js";
+
+/**
+ * @generated from enum gitpod.v1.WorkspaceSortableField
+ */
+export enum WorkspaceSortableField {
+  /**
+   * @generated from enum value: WORKSPACE_SORTABLE_FIELD_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+}
+// Retrieve enum metadata with: proto3.getEnumType(WorkspaceSortableField)
+proto3.util.setEnumType(WorkspaceSortableField, "gitpod.v1.WorkspaceSortableField", [
+  { no: 0, name: "WORKSPACE_SORTABLE_FIELD_UNSPECIFIED" },
+]);
 
 /**
  * Admission level describes who can access a workspace instance and its ports.
@@ -205,6 +221,211 @@ export class WatchWorkspaceStatusResponse extends Message<WatchWorkspaceStatusRe
 
   static equals(a: WatchWorkspaceStatusResponse | PlainMessage<WatchWorkspaceStatusResponse> | undefined, b: WatchWorkspaceStatusResponse | PlainMessage<WatchWorkspaceStatusResponse> | undefined): boolean {
     return proto3.util.equals(WatchWorkspaceStatusResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message gitpod.v1.ListWorkspacesRequest
+ */
+export class ListWorkspacesRequest extends Message<ListWorkspacesRequest> {
+  /**
+   * pagination contains the pagination options for listing workspaces
+   *
+   * @generated from field: gitpod.v1.PaginationRequest pagination = 1;
+   */
+  pagination?: PaginationRequest;
+
+  /**
+   * @generated from field: repeated gitpod.v1.WorkspaceSortRequest sorts = 2;
+   */
+  sorts: WorkspaceSortRequest[] = [];
+
+  /**
+   * scope of the workspaces
+   *
+   * @generated from field: gitpod.v1.ListWorkspacesRequest.Scope scope = 3;
+   */
+  scope = ListWorkspacesRequest_Scope.UNSPECIFIED;
+
+  /**
+   * organization_id is the ID of the organization that contains the workspaces
+   *
+   * @generated from field: string organization_id = 4;
+   */
+  organizationId = "";
+
+  /**
+   * pinned indicates whether to list only pinned workspaces
+   *
+   * @generated from field: bool pinned = 5;
+   */
+  pinned = false;
+
+  /**
+   * search_term is a search term to filter workspaces by name
+   *
+   * @generated from field: string search_term = 6;
+   */
+  searchTerm = "";
+
+  constructor(data?: PartialMessage<ListWorkspacesRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "gitpod.v1.ListWorkspacesRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "pagination", kind: "message", T: PaginationRequest },
+    { no: 2, name: "sorts", kind: "message", T: WorkspaceSortRequest, repeated: true },
+    { no: 3, name: "scope", kind: "enum", T: proto3.getEnumType(ListWorkspacesRequest_Scope) },
+    { no: 4, name: "organization_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "pinned", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "search_term", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListWorkspacesRequest {
+    return new ListWorkspacesRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListWorkspacesRequest {
+    return new ListWorkspacesRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListWorkspacesRequest {
+    return new ListWorkspacesRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListWorkspacesRequest | PlainMessage<ListWorkspacesRequest> | undefined, b: ListWorkspacesRequest | PlainMessage<ListWorkspacesRequest> | undefined): boolean {
+    return proto3.util.equals(ListWorkspacesRequest, a, b);
+  }
+}
+
+/**
+ * @generated from enum gitpod.v1.ListWorkspacesRequest.Scope
+ */
+export enum ListWorkspacesRequest_Scope {
+  /**
+   * @generated from enum value: SCOPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * SCOPE_MY_WORKSPACES_IN_ORGANIZATION scopes workspaces that is owned by current user in the organization
+   *
+   * @generated from enum value: SCOPE_MY_WORKSPACES_IN_ORGANIZATION = 1;
+   */
+  MY_WORKSPACES_IN_ORGANIZATION = 1,
+
+  /**
+   * SCOPE_ALL_WORKSPACES_IN_ORGANIZATION scopes all workspaces in the organization
+   *
+   * @generated from enum value: SCOPE_ALL_WORKSPACES_IN_ORGANIZATION = 2;
+   */
+  ALL_WORKSPACES_IN_ORGANIZATION = 2,
+
+  /**
+   * SCOPE_ALL_WORKSPACES_IN_INSTALLATION scopes all workspaces in the installation
+   *
+   * @generated from enum value: SCOPE_ALL_WORKSPACES_IN_INSTALLATION = 3;
+   */
+  ALL_WORKSPACES_IN_INSTALLATION = 3,
+}
+// Retrieve enum metadata with: proto3.getEnumType(ListWorkspacesRequest_Scope)
+proto3.util.setEnumType(ListWorkspacesRequest_Scope, "gitpod.v1.ListWorkspacesRequest.Scope", [
+  { no: 0, name: "SCOPE_UNSPECIFIED" },
+  { no: 1, name: "SCOPE_MY_WORKSPACES_IN_ORGANIZATION" },
+  { no: 2, name: "SCOPE_ALL_WORKSPACES_IN_ORGANIZATION" },
+  { no: 3, name: "SCOPE_ALL_WORKSPACES_IN_INSTALLATION" },
+]);
+
+/**
+ * @generated from message gitpod.v1.ListWorkspacesResponse
+ */
+export class ListWorkspacesResponse extends Message<ListWorkspacesResponse> {
+  /**
+   * workspaces are the workspaces that matched the query
+   *
+   * @generated from field: repeated gitpod.v1.Workspace workspaces = 1;
+   */
+  workspaces: Workspace[] = [];
+
+  /**
+   * pagination contains the pagination options for listing workspaces
+   *
+   * @generated from field: gitpod.v1.PaginationResponse pagination = 2;
+   */
+  pagination?: PaginationResponse;
+
+  constructor(data?: PartialMessage<ListWorkspacesResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "gitpod.v1.ListWorkspacesResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "workspaces", kind: "message", T: Workspace, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListWorkspacesResponse {
+    return new ListWorkspacesResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListWorkspacesResponse {
+    return new ListWorkspacesResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListWorkspacesResponse {
+    return new ListWorkspacesResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListWorkspacesResponse | PlainMessage<ListWorkspacesResponse> | undefined, b: ListWorkspacesResponse | PlainMessage<ListWorkspacesResponse> | undefined): boolean {
+    return proto3.util.equals(ListWorkspacesResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message gitpod.v1.WorkspaceSortRequest
+ */
+export class WorkspaceSortRequest extends Message<WorkspaceSortRequest> {
+  /**
+   * @generated from field: gitpod.v1.WorkspaceSortableField field = 1;
+   */
+  field = WorkspaceSortableField.UNSPECIFIED;
+
+  /**
+   * @generated from field: gitpod.v1.SortOrder order = 2;
+   */
+  order = SortOrder.UNSPECIFIED;
+
+  constructor(data?: PartialMessage<WorkspaceSortRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "gitpod.v1.WorkspaceSortRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "field", kind: "enum", T: proto3.getEnumType(WorkspaceSortableField) },
+    { no: 2, name: "order", kind: "enum", T: proto3.getEnumType(SortOrder) },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkspaceSortRequest {
+    return new WorkspaceSortRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WorkspaceSortRequest {
+    return new WorkspaceSortRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WorkspaceSortRequest {
+    return new WorkspaceSortRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: WorkspaceSortRequest | PlainMessage<WorkspaceSortRequest> | undefined, b: WorkspaceSortRequest | PlainMessage<WorkspaceSortRequest> | undefined): boolean {
+    return proto3.util.equals(WorkspaceSortRequest, a, b);
   }
 }
 
@@ -965,3 +1186,4 @@ export class WorkspaceEnvironmentVariable extends Message<WorkspaceEnvironmentVa
     return proto3.util.equals(WorkspaceEnvironmentVariable, a, b);
   }
 }
+
