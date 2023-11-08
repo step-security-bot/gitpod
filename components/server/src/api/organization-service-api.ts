@@ -39,6 +39,8 @@ import {
 import { PublicAPIConverter } from "@gitpod/gitpod-protocol/lib/public-api-converter";
 import { OrganizationService } from "../orgs/organization-service";
 import { PaginationResponse } from "@gitpod/public-api/lib/gitpod/v1/pagination_pb";
+import { ctx, userId } from "../util/request-context";
+import { ApplicationError, ErrorCodes } from "@gitpod/gitpod-protocol/lib/messaging/error";
 
 @injectable()
 export class OrganizationServiceAPI implements ServiceImpl<typeof OrganizationServiceInterface> {
@@ -49,18 +51,20 @@ export class OrganizationServiceAPI implements ServiceImpl<typeof OrganizationSe
         private readonly apiConverter: PublicAPIConverter,
     ) {}
 
-    async createOrganization(
-        req: CreateOrganizationRequest,
-        context: HandlerContext,
-    ): Promise<CreateOrganizationResponse> {
-        const org = await this.orgService.createOrganization(context.user.id, req.name);
+    async createOrganization(req: CreateOrganizationRequest, _: HandlerContext): Promise<CreateOrganizationResponse> {
+        // TODO(gpl) This mimicks the current behavior of adding the subjectId as owner
+        const ownerId = ctx().subjectId?.userId();
+        if (!ownerId) {
+            throw new ApplicationError(ErrorCodes.BAD_REQUEST, "No userId available");
+        }
+        const org = await this.orgService.createOrganization(ownerId, req.name);
         const response = new CreateOrganizationResponse();
         response.organization = this.apiConverter.toOrganization(org);
         return response;
     }
 
-    async getOrganization(req: GetOrganizationRequest, context: HandlerContext): Promise<GetOrganizationResponse> {
-        const org = await this.orgService.getOrganization(context.user.id, req.organizationId);
+    async getOrganization(req: GetOrganizationRequest, _: HandlerContext): Promise<GetOrganizationResponse> {
+        const org = await this.orgService.getOrganization(userId(), req.organizationId);
         const response = new GetOrganizationResponse();
         response.organization = this.apiConverter.toOrganization(org);
         return response;
@@ -70,7 +74,7 @@ export class OrganizationServiceAPI implements ServiceImpl<typeof OrganizationSe
         req: UpdateOrganizationRequest,
         context: HandlerContext,
     ): Promise<UpdateOrganizationResponse> {
-        const org = await this.orgService.updateOrganization(context.user.id, req.organizationId, {
+        const org = await this.orgService.updateOrganization(userId(), req.organizationId, {
             name: req.name,
         });
         return new UpdateOrganizationResponse({
@@ -83,7 +87,7 @@ export class OrganizationServiceAPI implements ServiceImpl<typeof OrganizationSe
         context: HandlerContext,
     ): Promise<ListOrganizationsResponse> {
         const orgs = await this.orgService.listOrganizations(
-            context.user.id,
+            userId(),
             {
                 limit: req.pagination?.pageSize || 100,
                 offset: (req.pagination?.page || 0) * (req.pagination?.pageSize || 0),
@@ -97,26 +101,23 @@ export class OrganizationServiceAPI implements ServiceImpl<typeof OrganizationSe
         return response;
     }
 
-    async deleteOrganization(
-        req: DeleteOrganizationRequest,
-        context: HandlerContext,
-    ): Promise<DeleteOrganizationResponse> {
-        await this.orgService.deleteOrganization(context.user.id, req.organizationId);
+    async deleteOrganization(req: DeleteOrganizationRequest, _: HandlerContext): Promise<DeleteOrganizationResponse> {
+        await this.orgService.deleteOrganization(userId(), req.organizationId);
         return new DeleteOrganizationResponse();
     }
 
     async getOrganizationInvitation(
         req: GetOrganizationInvitationRequest,
-        context: HandlerContext,
+        _: HandlerContext,
     ): Promise<GetOrganizationInvitationResponse> {
-        const invitation = await this.orgService.getOrCreateInvite(context.user.id, req.organizationId);
+        const invitation = await this.orgService.getOrCreateInvite(userId(), req.organizationId);
         const response = new GetOrganizationInvitationResponse();
         response.invitationId = invitation.id;
         return response;
     }
 
-    async joinOrganization(req: JoinOrganizationRequest, context: HandlerContext): Promise<JoinOrganizationResponse> {
-        const orgId = await this.orgService.joinOrganization(context.user.id, req.invitationId);
+    async joinOrganization(req: JoinOrganizationRequest, _: HandlerContext): Promise<JoinOrganizationResponse> {
+        const orgId = await this.orgService.joinOrganization(userId(), req.invitationId);
         const result = new JoinOrganizationResponse();
         result.organizationId = orgId;
         return result;
@@ -124,9 +125,9 @@ export class OrganizationServiceAPI implements ServiceImpl<typeof OrganizationSe
 
     async resetOrganizationInvitation(
         req: ResetOrganizationInvitationRequest,
-        context: HandlerContext,
+        _: HandlerContext,
     ): Promise<ResetOrganizationInvitationResponse> {
-        const inviteId = await this.orgService.resetInvite(context.user.id, req.organizationId);
+        const inviteId = await this.orgService.resetInvite(userId(), req.organizationId);
         const result = new ResetOrganizationInvitationResponse();
         result.invitationId = inviteId.id;
         return result;
@@ -134,9 +135,9 @@ export class OrganizationServiceAPI implements ServiceImpl<typeof OrganizationSe
 
     async listOrganizationMembers(
         req: ListOrganizationMembersRequest,
-        context: HandlerContext,
+        _: HandlerContext,
     ): Promise<ListOrganizationMembersResponse> {
-        const members = await this.orgService.listMembers(context.user.id, req.organizationId);
+        const members = await this.orgService.listMembers(userId(), req.organizationId);
         //TODO pagination
         const response = new ListOrganizationMembersResponse();
         response.members = members.map((member) => this.apiConverter.toOrganizationMember(member));
@@ -147,16 +148,16 @@ export class OrganizationServiceAPI implements ServiceImpl<typeof OrganizationSe
 
     async updateOrganizationMember(
         req: UpdateOrganizationMemberRequest,
-        context: HandlerContext,
+        _: HandlerContext,
     ): Promise<UpdateOrganizationMemberResponse> {
         await this.orgService.addOrUpdateMember(
-            context.user.id,
+            userId(),
             req.organizationId,
             req.userId,
             this.apiConverter.fromOrgMemberRole(req.role),
         );
         const member = await this.orgService
-            .listMembers(context.user.id, req.organizationId)
+            .listMembers(userId(), req.organizationId)
             .then((members) => members.find((member) => member.userId === req.userId));
         return new UpdateOrganizationMemberResponse({
             member: member && this.apiConverter.toOrganizationMember(member),
@@ -165,17 +166,17 @@ export class OrganizationServiceAPI implements ServiceImpl<typeof OrganizationSe
 
     async deleteOrganizationMember(
         req: DeleteOrganizationMemberRequest,
-        context: HandlerContext,
+        _: HandlerContext,
     ): Promise<DeleteOrganizationMemberResponse> {
-        await this.orgService.removeOrganizationMember(context.user.id, req.organizationId, req.userId);
+        await this.orgService.removeOrganizationMember(userId(), req.organizationId, req.userId);
         return new DeleteOrganizationMemberResponse();
     }
 
     async getOrganizationSettings(
         req: GetOrganizationSettingsRequest,
-        context: HandlerContext,
+        _: HandlerContext,
     ): Promise<GetOrganizationSettingsResponse> {
-        const settings = await this.orgService.getSettings(context.user.id, req.organizationId);
+        const settings = await this.orgService.getSettings(userId(), req.organizationId);
         const response = new GetOrganizationSettingsResponse();
         response.settings = this.apiConverter.toOrganizationSettings(settings);
         return response;
@@ -183,9 +184,9 @@ export class OrganizationServiceAPI implements ServiceImpl<typeof OrganizationSe
 
     async updateOrganizationSettings(
         req: UpdateOrganizationSettingsRequest,
-        context: HandlerContext,
+        _: HandlerContext,
     ): Promise<UpdateOrganizationSettingsResponse> {
-        const settings = await this.orgService.updateSettings(context.user.id, req.organizationId, {
+        const settings = await this.orgService.updateSettings(userId(), req.organizationId, {
             workspaceSharingDisabled: req.settings?.workspaceSharingDisabled,
             defaultWorkspaceImage: req.settings?.defaultWorkspaceImage,
         });
