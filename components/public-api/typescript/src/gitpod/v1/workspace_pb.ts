@@ -176,9 +176,9 @@ export class Workspace extends Message<Workspace> {
    *
    * +optional defaults to the user's default region
    *
-   * @generated from field: optional string region = 8;
+   * @generated from field: string region = 8;
    */
-  region?: string;
+  region = "";
 
   /**
    * workspace_class specifies the workspace class with which to create the
@@ -188,9 +188,9 @@ export class Workspace extends Message<Workspace> {
    * +optional defaults to the class configured on the project or the cluster's
    * default class.
    *
-   * @generated from field: optional string workspace_class = 9;
+   * @generated from field: string workspace_class = 9;
    */
-  workspaceClass?: string;
+  workspaceClass = "";
 
   /**
    * editor specifies the editor that will be used with this workspace.
@@ -198,7 +198,7 @@ export class Workspace extends Message<Workspace> {
    *
    * +optional defaults to the default editor of the user
    *
-   * @generated from field: optional gitpod.v1.EditorReference editor = 10;
+   * @generated from field: gitpod.v1.EditorReference editor = 10;
    */
   editor?: EditorReference;
 
@@ -215,9 +215,9 @@ export class Workspace extends Message<Workspace> {
    * from which this workspace was created
    * +optional if empty then this workspace was not created from a prebuild
    *
-   * @generated from field: optional string prebuild_id = 12;
+   * @generated from field: string prebuild_id = 12;
    */
-  prebuildId?: string;
+  prebuildId = "";
 
   constructor(data?: PartialMessage<Workspace>) {
     super();
@@ -234,11 +234,11 @@ export class Workspace extends Message<Workspace> {
     { no: 5, name: "pinned", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 6, name: "status", kind: "message", T: WorkspaceStatus },
     { no: 7, name: "additional_environment_variables", kind: "message", T: WorkspaceEnvironmentVariable, repeated: true },
-    { no: 8, name: "region", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
-    { no: 9, name: "workspace_class", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
-    { no: 10, name: "editor", kind: "message", T: EditorReference, opt: true },
+    { no: 8, name: "region", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "workspace_class", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 10, name: "editor", kind: "message", T: EditorReference },
     { no: 11, name: "context_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 12, name: "prebuild_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 12, name: "prebuild_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Workspace {
@@ -275,9 +275,9 @@ export class WorkspaceStatus extends Message<WorkspaceStatus> {
   /**
    * message is an optional human-readable message detailing the current phase
    *
-   * @generated from field: optional string message = 2;
+   * @generated from field: string message = 2;
    */
-  message?: string;
+  message = "";
 
   /**
    * workspace_url is the URL of the workspace. Only present when the phase is
@@ -333,7 +333,7 @@ export class WorkspaceStatus extends Message<WorkspaceStatus> {
   static readonly typeName = "gitpod.v1.WorkspaceStatus";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "phase", kind: "message", T: WorkspacePhase },
-    { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "workspace_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "git_status", kind: "message", T: WorkspaceGitStatus },
     { no: 5, name: "ports", kind: "message", T: WorkspacePort, repeated: true },
@@ -367,17 +367,17 @@ export class WorkspaceConditions extends Message<WorkspaceConditions> {
    * failed contains technical details for the failure of the workspace.
    * +optional If this field is empty, the workspace has not failed.
    *
-   * @generated from field: optional string failed = 1;
+   * @generated from field: string failed = 1;
    */
-  failed?: string;
+  failed = "";
 
   /**
    * timeout contains the reason the workspace has timed out.
    * +optional If this field is empty, the workspace has not timed out.
    *
-   * @generated from field: optional string timeout = 2;
+   * @generated from field: string timeout = 2;
    */
-  timeout?: string;
+  timeout = "";
 
   constructor(data?: PartialMessage<WorkspaceConditions>) {
     super();
@@ -387,8 +387,8 @@ export class WorkspaceConditions extends Message<WorkspaceConditions> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "gitpod.v1.WorkspaceConditions";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "failed", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
-    { no: 2, name: "timeout", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 1, name: "failed", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "timeout", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkspaceConditions {
@@ -845,9 +845,9 @@ export class WorkspaceEnvironmentVariable extends Message<WorkspaceEnvironmentVa
   name = "";
 
   /**
-   * @generated from field: optional string value = 2;
+   * @generated from field: string value = 2;
    */
-  value?: string;
+  value = "";
 
   constructor(data?: PartialMessage<WorkspaceEnvironmentVariable>) {
     super();
@@ -858,7 +858,7 @@ export class WorkspaceEnvironmentVariable extends Message<WorkspaceEnvironmentVa
   static readonly typeName = "gitpod.v1.WorkspaceEnvironmentVariable";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 2, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkspaceEnvironmentVariable {

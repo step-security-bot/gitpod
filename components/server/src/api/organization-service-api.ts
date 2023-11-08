@@ -185,9 +185,13 @@ export class OrganizationServiceAPI implements ServiceImpl<typeof OrganizationSe
         req: UpdateOrganizationSettingsRequest,
         context: HandlerContext,
     ): Promise<UpdateOrganizationSettingsResponse> {
+        let defaultWorkspaceImage: string | null | undefined = req.defaultWorkspaceImage;
+        if (req.resetMask?.paths.includes("defaultWorkspaceImage")) {
+            defaultWorkspaceImage = null;
+        }
         const settings = await this.orgService.updateSettings(context.user.id, req.organizationId, {
-            workspaceSharingDisabled: req.settings?.workspaceSharingDisabled,
-            defaultWorkspaceImage: req.settings?.defaultWorkspaceImage,
+            workspaceSharingDisabled: req?.workspaceSharingDisabled,
+            defaultWorkspaceImage,
         });
         return new UpdateOrganizationSettingsResponse({
             settings: this.apiConverter.toOrganizationSettings(settings),

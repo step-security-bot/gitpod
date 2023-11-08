@@ -211,8 +211,8 @@ export class JsonRpcOrganizationClient implements PromiseClient<typeof Organizat
             throw new ConnectError("id is required", Code.InvalidArgument);
         }
         await getGitpodService().server.updateOrgSettings(request.organizationId, {
-            workspaceSharingDisabled: request.settings?.workspaceSharingDisabled,
-            defaultWorkspaceImage: request.settings?.defaultWorkspaceImage,
+            workspaceSharingDisabled: request?.workspaceSharingDisabled,
+            defaultWorkspaceImage: request?.defaultWorkspaceImage,
         });
         return new UpdateOrganizationSettingsResponse();
     }

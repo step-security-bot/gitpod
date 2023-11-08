@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package gitpod.v1;
 
+import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 import "gitpod/v1/pagination.proto";
 
@@ -18,9 +19,9 @@ message OrganizationMember {
   string user_id = 1;
   OrganizationRole role = 2;
   google.protobuf.Timestamp member_since = 3;
-  optional string avatar_url = 4;
-  optional string full_name = 5;
-  optional string email = 6;
+  string avatar_url = 4;
+  string full_name = 5;
+  string email = 6;
   bool owned_by_organization = 7;
 }
 
@@ -32,7 +33,7 @@ enum OrganizationRole {
 
 message OrganizationSettings {
   bool workspace_sharing_disabled = 1;
-  optional string default_workspace_image = 2;
+  string default_workspace_image = 2;
 }
 
 service OrganizationService {
@@ -107,8 +108,11 @@ message UpdateOrganizationSettingsRequest {
   // organization_id is the ID of the organization to update the settings for.
   string organization_id = 1;
 
-  // settings are the settings to update
-  OrganizationSettings settings = 2;
+  google.protobuf.FieldMask reset_mask = 2;
+
+  optional bool workspace_sharing_disabled = 3;
+
+  optional string default_workspace_image = 4;
 }
 
 message UpdateOrganizationSettingsResponse {

@@ -19,6 +19,7 @@ import { inject, injectable } from "inversify";
 import { Authorizer } from "../authorization/authorizer";
 import { ProjectsService } from "../projects/projects-service";
 import { TransactionalContext } from "@gitpod/gitpod-db/lib/typeorm/transactional-db-impl";
+import { DefaultWorkspaceImageValidator } from "./default-workspace-image-validator";
 
 @injectable()
 export class OrganizationService {
@@ -28,6 +29,8 @@ export class OrganizationService {
         @inject(ProjectsService) private readonly projectsService: ProjectsService,
         @inject(Authorizer) private readonly auth: Authorizer,
         @inject(IAnalyticsWriter) private readonly analytics: IAnalyticsWriter,
+        @inject(DefaultWorkspaceImageValidator)
+        private readonly validateDefaultWorkspaceImage: DefaultWorkspaceImageValidator,
     ) {}
 
     async listOrganizations(
@@ -364,9 +367,21 @@ export class OrganizationService {
         return settings;
     }
 
-    async updateSettings(userId: string, orgId: string, settings: OrganizationSettings): Promise<OrganizationSettings> {
+    async updateSettings(
+        userId: string,
+        orgId: string,
+        settings: Partial<OrganizationSettings>,
+    ): Promise<OrganizationSettings> {
         await this.auth.checkPermissionOnOrganization(userId, "write_settings", orgId);
-        await this.teamDB.setOrgSettings(orgId, settings);
-        return settings;
+        const update = { ...settings };
+        const defaultWorkspaceImage = update.defaultWorkspaceImage?.trim();
+        if (defaultWorkspaceImage) {
+            await this.validateDefaultWorkspaceImage(userId, defaultWorkspaceImage);
+            update.defaultWorkspaceImage = defaultWorkspaceImage;
+        } else {
+            // Set to null if defaultWorkspaceImage is empty string, so that it can fallback to default image
+            update.defaultWorkspaceImage = null;
+        }
+        return await this.teamDB.setOrgSettings(orgId, update);
     }
 }

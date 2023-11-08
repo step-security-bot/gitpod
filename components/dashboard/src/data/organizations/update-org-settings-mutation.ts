@@ -23,10 +23,8 @@ export const useUpdateOrgSettingsMutation = () => {
         mutationFn: async ({ workspaceSharingDisabled, defaultWorkspaceImage }) => {
             const settings = await organizationClient.updateOrganizationSettings({
                 organizationId: teamId,
-                settings: {
-                    workspaceSharingDisabled: workspaceSharingDisabled || false,
-                    defaultWorkspaceImage,
-                },
+                workspaceSharingDisabled: workspaceSharingDisabled || false,
+                defaultWorkspaceImage,
             });
             return settings.settings || new OrganizationSettings();
         },

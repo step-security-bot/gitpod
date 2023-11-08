@@ -43,7 +43,7 @@ message Workspace {
   // Obtain available regions using the ListRegions operation.
   //
   // +optional defaults to the user's default region
-  optional string region = 8;
+  string region = 8;
 
   // workspace_class specifies the workspace class with which to create the
   // workspace. Obtain available workspace classes using the ListWorkspaceClass
@@ -51,13 +51,13 @@ message Workspace {
   //
   // +optional defaults to the class configured on the project or the cluster's
   // default class.
-  optional string workspace_class = 9;
+  string workspace_class = 9;
 
   // editor specifies the editor that will be used with this workspace.
   // Obtain available editors using the EditorService.ListEditors operation.
   //
   // +optional defaults to the default editor of the user
-  optional EditorReference editor = 10;
+  EditorReference editor = 10;
 
   // context_url is the normalized URL from which the workspace was created
   // TODO(ak) replace with resolveContextURL API
@@ -66,7 +66,7 @@ message Workspace {
   // Prebuild ID is the unique identifier of the prebuild
   // from which this workspace was created
   // +optional if empty then this workspace was not created from a prebuild
-  optional string prebuild_id = 12;
+  string prebuild_id = 12;
 }
 
 message WorkspaceStatus {
@@ -77,7 +77,7 @@ message WorkspaceStatus {
   WorkspacePhase phase = 1;
 
   // message is an optional human-readable message detailing the current phase
-  optional string message = 2;
+  string message = 2;
 
   // workspace_url is the URL of the workspace. Only present when the phase is
   // running.
@@ -104,11 +104,11 @@ message WorkspaceStatus {
 message WorkspaceConditions {
   // failed contains technical details for the failure of the workspace.
   // +optional If this field is empty, the workspace has not failed.
-  optional string failed = 1;
+  string failed = 1;
 
   // timeout contains the reason the workspace has timed out.
   // +optional If this field is empty, the workspace has not timed out.
-  optional string timeout = 2;
+  string timeout = 2;
 }
 
 // Admission level describes who can access a workspace instance and its ports.
@@ -256,5 +256,5 @@ message EditorReference {
 
 message WorkspaceEnvironmentVariable {
   string name = 1;
-  optional string value = 2;
+  string value = 2;
 }

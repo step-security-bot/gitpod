@@ -129,6 +129,7 @@ import { WorkspaceFactory } from "./workspace/workspace-factory";
 import { WorkspaceService } from "./workspace/workspace-service";
 import { WorkspaceStartController } from "./workspace/workspace-start-controller";
 import { WorkspaceStarter } from "./workspace/workspace-starter";
+import { DefaultWorkspaceImageValidator } from "./orgs/default-workspace-image-validator";
 
 export const productionContainerModule = new ContainerModule(
     (bind, unbind, isBound, rebind, unbindAsync, onActivation, onDeactivation) => {
@@ -375,5 +376,14 @@ export const productionContainerModule = new ContainerModule(
         bind(RedisMutex).toSelf().inSingletonScope();
         bind(RedisSubscriber).toSelf().inSingletonScope();
         bind(RedisPublisher).toSelf().inSingletonScope();
+
+        bind<DefaultWorkspaceImageValidator>(DefaultWorkspaceImageValidator).toDynamicValue((ctx) => {
+            const userService = ctx.container.get(UserService);
+            const workspaceService = ctx.container.get(WorkspaceService);
+            return async (userId: string, imageRef: string) => {
+                const user = await userService.findUserById(userId, userId);
+                await workspaceService.resolveBaseImage({}, user, imageRef);
+            };
+        });
     },
 );
