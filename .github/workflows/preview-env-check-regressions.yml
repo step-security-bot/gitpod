@@ -34,6 +34,11 @@ jobs:
       version: ${{ steps.configuration.outputs.version }}
       infrastructure_provider: ${{ steps.configuration.outputs.infrastructure_provider }}
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
       - name: "Set outputs"
         id: configuration
         run: |
@@ -62,7 +67,12 @@ jobs:
     concurrency:
       group: ${{ needs.configuration.outputs.name }}-infrastructure
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Create preview environment infrastructure
         id: create
         uses: ./.github/actions/preview-create
@@ -90,7 +100,12 @@ jobs:
         - /var/tmp:/var/tmp
         - /tmp:/tmp
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Check
         shell: bash
         env:
@@ -140,25 +155,25 @@ jobs:
           fi
       - name: Test Summary
         id: test_summary
-        uses: test-summary/action@v2
+        uses: test-summary/action@62bc5c68de2a6a0d02039763b8c754569df99e3f # v2.1
         with:
           paths: "test/tests/**/TEST.xml"
         if: always()
       - id: auth
         if: failure()
-        uses: google-github-actions/auth@v1
+        uses: google-github-actions/auth@35b0e87d162680511bf346c299f71c9c5c379033 # v1.1.1
         with:
           token_format: access_token
           credentials_json: "${{ secrets.GCP_CREDENTIALS }}"
       - name: Get Secrets from GCP
         if: failure()
         id: "secrets"
-        uses: "google-github-actions/get-secretmanager-secrets@v1"
+        uses: "google-github-actions/get-secretmanager-secrets@4d6d3dfd94110800dda8d84109cb6da0f6a5919d # v1.0.1"
         with:
           secrets: |-
             devx-slack-webhook:gitpod-core-dev/devx-alerts-slack-webhook
       - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2
+        uses: rtCamp/action-slack-notify@12e36fc18b0689399306c2e0b3e0f2978b7f1ee7 # v2.2.0
         if: failure()
         env:
           SLACK_WEBHOOK: "${{ steps.secrets.outputs.devx-slack-webhook }}"
@@ -172,7 +187,12 @@ jobs:
     if: always()
     runs-on: ${{ needs.create-runner.outputs.label }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Delete preview environment
         uses: ./.github/actions/delete-preview
         with:

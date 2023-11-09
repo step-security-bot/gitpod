@@ -51,12 +51,17 @@ jobs:
       pr_number: ${{ steps.pr-details.outputs.number }}
       pr_body: ${{ steps.pr-details.outputs.pr_body }}
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
       - name: "Determine Branch"
         id: branches
-        uses: transferwise/sanitize-branch-name@v1
+        uses: transferwise/sanitize-branch-name@b10b4d524ac5a7b645b43a3527db3a6cca017b9d # v1
         # Since we trigger this worklow on other event types, besides pull_request
         # We use this action to help us get the pr body, as it's not included in push/workflow_dispatch events
-      - uses: 8BitJonny/gh-get-current-pr@2.2.0
+      - uses: 8BitJonny/gh-get-current-pr@2215326c76d51bfa3f2af0a470f32677f6c0cae9 # 2.2.0
         id: pr-details
         with:
           sha: ${{ github.event.pull_request.head.sha }}
@@ -101,7 +106,12 @@ jobs:
     outputs:
       previewctl_hash: ${{ steps.build.outputs.previewctl_hash }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Setup Environment
         uses: ./.github/actions/setup-environment
         with:
@@ -125,7 +135,12 @@ jobs:
       group: ${{ github.ref == 'refs/heads/main' && github.run_id || github.sha }}-infrastructure
       cancel-in-progress: true
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Create preview environment infrastructure
         id: create
         uses: ./.github/actions/preview-create
@@ -167,7 +182,12 @@ jobs:
         # GitHub action + MySQL 8.0 need longer to initialize
         DB_RETRIES: 5
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: ./.github/actions/setup-environment
         with:
           sa_key: ${{ secrets.GCP_CREDENTIALS }}
@@ -187,7 +207,7 @@ jobs:
           exit "$RESULT"
       - name: Get Secrets from GCP
         id: "secrets"
-        uses: "google-github-actions/get-secretmanager-secrets@v1"
+        uses: "google-github-actions/get-secretmanager-secrets@4d6d3dfd94110800dda8d84109cb6da0f6a5919d # v1.0.1"
         with:
           secrets: |-
             segment-io-token:gitpod-core-dev/segment-io-token
@@ -297,14 +317,19 @@ jobs:
       matrix:
         env: [ staging, production ]
     steps:
-      - uses: gitpod-io/gh-app-auth@v0.1
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: gitpod-io/gh-app-auth@35b1171a2c0dbdbab1ba4a3b3689655a7ef6fa4f # v0.1
         id: auth
         with:
           private-key: ${{ secrets.ACTIONS_APP_PKEY }}
           app-id: 308947
           installation-id: 35574470
       - name: trigger installation
-        uses: actions/github-script@v6
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
         with:
           github-token: ${{ steps.auth.outputs.token }}
           script: |
@@ -335,7 +360,12 @@ jobs:
       group: ${{ github.ref == 'refs/heads/main' && github.run_id || github.sha }}-install
       cancel-in-progress: ${{ needs.configuration.outputs.is_main_branch == 'false' }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Deploy Gitpod to the preview environment
         id: deploy-gitpod
         uses: ./.github/actions/deploy-gitpod
@@ -347,7 +377,7 @@ jobs:
           with_dedicated_emu: ${{needs.configuration.outputs.with_dedicated_emulation}}
           analytics: ${{needs.configuration.outputs.analytics}}
           workspace_feature_flags: ${{needs.configuration.outputs.workspace_feature_flags}}
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
         if: needs.configuration.outputs.pr_number != '' && contains(needs.configuration.outputs.pr_body, 'gitpod:summary')
         with:
           script: |
@@ -380,7 +410,12 @@ jobs:
       group: ${{ github.ref == 'refs/heads/main' && github.run_id || github.sha }}-monitoring
       cancel-in-progress: true
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Deploy monitoring satellite to the preview environment
         id: deploy-monitoring-satellite
         uses: ./.github/actions/deploy-monitoring-satellite
@@ -405,7 +440,12 @@ jobs:
       group: ${{ needs.configuration.outputs.preview_name }}-integration-test
       cancel-in-progress: true
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: ./.github/actions/setup-environment
         with:
           sa_key: ${{ secrets.GCP_CREDENTIALS }}

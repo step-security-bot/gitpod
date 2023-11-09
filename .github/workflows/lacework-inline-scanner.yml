@@ -27,6 +27,11 @@ jobs:
       skip: ${{ steps.configuration.outputs.skip }}
       version: ${{ steps.configuration.outputs.version }}
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
       - name: "Set outputs"
         id: configuration
         run: |
@@ -54,14 +59,19 @@ jobs:
       image: eu.gcr.io/gitpod-core-dev/dev/dev-environment:aledbf-leeway-pigz-gha.18593
     steps:
       # Most of this is taken over from the Build workflow/preview-env-check-regressions workflow
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: ./.github/actions/setup-environment
         with:
           sa_key: ${{ secrets.GCP_CREDENTIALS }}
           leeway_segment_key: ${{ secrets.LEEWAY_SEGMENT_KEY }}
       - name: Get Secrets from GCP
         id: "secrets"
-        uses: "google-github-actions/get-secretmanager-secrets@v1"
+        uses: "google-github-actions/get-secretmanager-secrets@4d6d3dfd94110800dda8d84109cb6da0f6a5919d # v1.0.1"
         with:
           secrets: |-
             lacework-access-token:gitpod-core-dev/lacework-access-token

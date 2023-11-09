@@ -31,8 +31,13 @@ jobs:
         name: Update Platform Version from ${{ inputs.pluginName }}
         runs-on: ubuntu-latest
         steps:
+            - name: Harden Runner
+              uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+              with:
+                egress-policy: audit
+
             - name: Checkout Repository
-              uses: actions/checkout@v4
+              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
             - name: Get Current Platform Version
               id: current-version
               run: |
@@ -72,7 +77,7 @@ jobs:
             - name: Create Pull Request for Gateway Plugin
               id: create-gateway-pr
               if: ${{ contains(inputs.pluginId, 'gateway-plugin') && steps.latest-version.outputs.result != steps.current-version.outputs.result }}
-              uses: peter-evans/create-pull-request@v4
+              uses: peter-evans/create-pull-request@38e0b6e68b4c852a5500a94740f0e535e0d7ba54 # v4.2.4
               with:
                   title: "[JetBrains] Update Platform Version from ${{ inputs.pluginName }}"
                   body: |
@@ -119,7 +124,7 @@ jobs:
             - name: Create Pull Request for Backend Plugin
               id: create-backend-pr
               if: ${{ contains(inputs.pluginId, 'backend-plugin') && steps.latest-version.outputs.result != steps.current-version.outputs.result }}
-              uses: peter-evans/create-pull-request@v4
+              uses: peter-evans/create-pull-request@38e0b6e68b4c852a5500a94740f0e535e0d7ba54 # v4.2.4
               with:
                   title: "[JetBrains] Update Platform Version from ${{ inputs.pluginName }}"
                   body: |
@@ -162,10 +167,10 @@ jobs:
                   author: Robo Quat <roboquat@gitpod.io>
             - name: Get previous job's status
               id: lastrun
-              uses: filiptronicek/get-last-job-status@main
+              uses: filiptronicek/get-last-job-status@1c211ff20d1706ff0bc3fc8022f7bd6518b88bc4 # main
             - name: Slack Notification
               if: ${{ (success() && steps.lastrun.outputs.status == 'failed') || failure() }}
-              uses: rtCamp/action-slack-notify@v2
+              uses: rtCamp/action-slack-notify@12e36fc18b0689399306c2e0b3e0f2978b7f1ee7 # v2.2.0
               env:
                   SLACK_WEBHOOK: ${{ secrets.slackWebhook }}
                   SLACK_COLOR: ${{ job.status }}

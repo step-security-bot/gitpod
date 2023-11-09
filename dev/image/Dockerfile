@@ -2,7 +2,7 @@
 # Licensed under the GNU Affero General Public License (AGPL).
 # See License.AGPL.txt in the project root for license information.
 
-FROM gitpod/workspace-gitpod-dev:latest
+FROM gitpod/workspace-gitpod-dev:latest@sha256:2ee774d54fe571dc9daf644221a50087d978fa716557eacf58fe77836a0ddbc4
 
 ENV TRIGGER_REBUILD 40
 

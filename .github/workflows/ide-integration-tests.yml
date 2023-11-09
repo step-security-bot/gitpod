@@ -36,6 +36,11 @@ jobs:
       name: ${{ steps.configuration.outputs.name }}
       version: ${{ steps.configuration.outputs.version }}
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
       - name: "Set outputs"
         id: configuration
         shell: bash
@@ -62,7 +67,7 @@ jobs:
               } >> $GITHUB_OUTPUT
           fi
       - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2
+        uses: rtCamp/action-slack-notify@12e36fc18b0689399306c2e0b3e0f2978b7f1ee7 # v2.2.0
         if: failure()
         env:
           SLACK_WEBHOOK: ${{ secrets.IDE_SLACK_WEBHOOK }}
@@ -77,7 +82,12 @@ jobs:
     concurrency:
       group: ${{ needs.configuration.outputs.name }}-infrastructure
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Create preview environment infrastructure
         id: create
         uses: ./.github/actions/preview-create
@@ -105,7 +115,12 @@ jobs:
         - /var/tmp:/var/tmp
         - /tmp:/tmp
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Integration Test
         shell: bash
         env:
@@ -170,12 +185,12 @@ jobs:
           exit $FAILURE_COUNT
       - name: Test Summary
         id: test_summary
-        uses: test-summary/action@v2
+        uses: test-summary/action@62bc5c68de2a6a0d02039763b8c754569df99e3f # v2.1
         with:
           paths: "test/tests/**/TEST-*.xml"
         if: always()
       - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2
+        uses: rtCamp/action-slack-notify@12e36fc18b0689399306c2e0b3e0f2978b7f1ee7 # v2.2.0
         if: success() || failure()
         env:
           SLACK_WEBHOOK: ${{ secrets.IDE_SLACK_WEBHOOK }}
@@ -189,7 +204,12 @@ jobs:
     if: github.event.inputs.skip_delete != 'true' && always()
     runs-on: ${{ needs.create-runner.outputs.label }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Delete preview environment
         uses: ./.github/actions/delete-preview
         with:

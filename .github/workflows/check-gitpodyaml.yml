@@ -10,8 +10,13 @@ jobs:
     name: Build and upload model
     runs-on: ubuntu-latest
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
       - name: Notify
-        uses: KeisukeYamashita/create-comment@v1
+        uses: KeisukeYamashita/create-comment@1d95d97d7b1b73ab66e5ca931610e4e10ddc5eed # v1
         with:
           number: ${{ github.event.pull_request.number }}
           comment: |

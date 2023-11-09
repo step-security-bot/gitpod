@@ -13,7 +13,7 @@ RUN for FILE in `ls /bin/gitpod-local-companion*`;do \
   gzip -v -f -9 -k "$FILE"; \
 done
 
-FROM caddy/caddy:2.7.5-alpine
+FROM caddy/caddy:2.7.5-alpine@sha256:6fe2eb7d76e2449e2c958305c0d58db47c8db5cef5592c37e33269260465d0b9
 
 COPY conf/Caddyfile /etc/caddy/Caddyfile
 COPY static /www/

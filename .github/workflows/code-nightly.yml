@@ -18,7 +18,12 @@ jobs:
     container:
       image: eu.gcr.io/gitpod-core-dev/dev/dev-environment:aledbf-leeway-pigz-gha.18593
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: ./.github/actions/setup-environment
         with:
           sa_key: ${{ secrets.GCP_CREDENTIALS }}
@@ -43,10 +48,10 @@ jobs:
             .:docker
       - name: Get previous job's status
         id: lastrun
-        uses: filiptronicek/get-last-job-status@main
+        uses: filiptronicek/get-last-job-status@1c211ff20d1706ff0bc3fc8022f7bd6518b88bc4 # main
       - name: Slack Notification
         if: ${{ (success() && steps.lastrun.outputs.status == 'failed') || failure() }}
-        uses: rtCamp/action-slack-notify@v2
+        uses: rtCamp/action-slack-notify@12e36fc18b0689399306c2e0b3e0f2978b7f1ee7 # v2.2.0
         env:
           SLACK_WEBHOOK: ${{ secrets.IDE_SLACK_WEBHOOK }}
           SLACK_COLOR: ${{ job.status }}

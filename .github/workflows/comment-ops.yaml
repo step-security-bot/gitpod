@@ -25,8 +25,13 @@ jobs:
       run_id: ${{ fromJSON(steps.run_outputs.outputs.result).id }}
       recreate_vm: ${{ steps.configure.outputs.recreate_vm }}
     steps:
-      # In order for us to find out from which PR the comment originates, we use the `xt0rted/pull-request-comment-branch@v1` action
-      - uses: xt0rted/pull-request-comment-branch@v1
+      # In order for us to find out from which PR the comment originates, we use the `xt0rted/pull-request-comment-branch@653a7d5ca8bd91d3c5cb83286063314d0b063b8e # v1.4.0` action
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: xt0rted/pull-request-comment-branch@653a7d5ca8bd91d3c5cb83286063314d0b063b8e # v1.4.0
         id: comment-branch
       # Set outputs we can reuse in the steps
       - name: Set outputs
@@ -40,7 +45,7 @@ jobs:
       # Also we use workflow_dispatch, instead of a workflow_call ( uses: ./build.yaml with: ...)
       # Because with the latter it's not possible to trigger a dynamic one (i.e. based on a branch) - the name has to be hardcoded
       - name: Trigger Workflow
-        uses: actions/github-script@v6
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
         with:
           script: |
             await github.rest.actions.createWorkflowDispatch({
@@ -57,7 +62,7 @@ jobs:
       # But it's an overkill for now
       # Instead, we wait a little, and grab the last job that was triggered by a `workflow_dispatch` event, AND is not completed, and we hope for the best 🤞
       - name: Get run URL
-        uses: actions/github-script@v6
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
         id: run_outputs
         with:
           github-token: ${{ github.token }}
@@ -80,7 +85,7 @@ jobs:
             return url[0];
       # Comment with a link to the job that got triggered
       - name: Update comment with workflow run
-        uses: actions/github-script@v6
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
         with:
           github-token: ${{ github.token }}
           script: |
@@ -103,7 +108,12 @@ jobs:
     needs: [ configure ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github-script@v6
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
         with:
           github-token: ${{ github.token }}
           script: |

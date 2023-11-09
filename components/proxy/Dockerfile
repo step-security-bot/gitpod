@@ -2,7 +2,7 @@
 # Licensed under the GNU Affero General Public License (AGPL).
 # See License.AGPL.txt in the project root for license information.
 
-FROM caddy:2.7.5-builder AS builder
+FROM caddy:2.7.5-builder@sha256:b94d3fcd6716230d3255c418016c002f5c95a4ae9bc1aa5304738538abada624 AS builder
 
 WORKDIR /plugins
 
