@@ -2,8 +2,14 @@ name: Team Labeler
 on:
   pull_request:
     types: [review_requested]
+permissions:
+  contents: read
+
 jobs:
   label:
+    permissions:
+      issues: write  # for andymckay/labeler to label issues
+      pull-requests: write  # for andymckay/labeler to label PRs
     name: Apply team labels
     runs-on: ubuntu-20.04
     steps:
