@@ -18,6 +18,11 @@ jobs:
     container:
       image: eu.gcr.io/gitpod-core-dev/dev/dev-environment:aledbf-leeway-pigz-gha.18593
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-environment
         with:

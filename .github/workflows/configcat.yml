@@ -8,6 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     name: Scan repository for configcat code references
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@v4
       - name: Scan & upload

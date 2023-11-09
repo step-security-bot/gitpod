@@ -34,6 +34,11 @@ jobs:
       version: ${{ steps.configuration.outputs.version }}
       infrastructure_provider: ${{ steps.configuration.outputs.infrastructure_provider }}
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
       - name: "Set outputs"
         id: configuration
         run: |
@@ -62,6 +67,11 @@ jobs:
     concurrency:
       group: ${{ needs.configuration.outputs.name }}-infrastructure
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@v4
       - name: Create preview environment infrastructure
         id: create
@@ -90,6 +100,11 @@ jobs:
         - /var/tmp:/var/tmp
         - /tmp:/tmp
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@v4
       - name: Check
         shell: bash
@@ -172,6 +187,11 @@ jobs:
     if: always()
     runs-on: ${{ needs.create-runner.outputs.label }}
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@v4
       - name: Delete preview environment
         uses: ./.github/actions/delete-preview

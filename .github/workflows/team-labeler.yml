@@ -2,11 +2,22 @@ name: Team Labeler
 on:
   pull_request:
     types: [review_requested]
+permissions:
+  contents: read
+
 jobs:
   label:
+    permissions:
+      issues: write  # for andymckay/labeler to label issues
+      pull-requests: write  # for andymckay/labeler to label PRs
     name: Apply team labels
     runs-on: ubuntu-20.04
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
       - name: Set team labels as output
         id: team_labels
         run: |
@@ -14,6 +25,6 @@ jobs:
           echo ::set-output name=label::${LABELS//engineering-/}
       - name: Add team labels
         if: join(github.event.pull_request.requested_teams.*.slug, '') != ''
-        uses: andymckay/labeler@1.0.4
+        uses: andymckay/labeler@e6c4322d0397f3240f0e7e30a33b5c5df2d39e90 # 1.0.4
         with:
           add-labels: "${{ steps.team_labels.outputs.label }}"

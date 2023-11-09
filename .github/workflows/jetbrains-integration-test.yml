@@ -35,6 +35,11 @@ jobs:
   jetbrains-smoke-test-linux:
     runs-on: ubuntu-latest
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
       - name: Generate Summary
         if: always()
         run: |

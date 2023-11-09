@@ -26,6 +26,11 @@ jobs:
       recreate_vm: ${{ steps.configure.outputs.recreate_vm }}
     steps:
       # In order for us to find out from which PR the comment originates, we use the `xt0rted/pull-request-comment-branch@v1` action
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
       - uses: xt0rted/pull-request-comment-branch@v1
         id: comment-branch
       # Set outputs we can reuse in the steps
@@ -103,6 +108,11 @@ jobs:
     needs: [ configure ]
     runs-on: ubuntu-latest
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
       - uses: actions/github-script@v6
         with:
           github-token: ${{ github.token }}

@@ -20,6 +20,11 @@ jobs:
       names: ${{ steps.set-matrix.outputs.names }}
       count: ${{ steps.set-matrix.outputs.count }}
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -57,6 +62,11 @@ jobs:
       matrix:
         name: ${{ fromJSON(needs.stale.outputs.names) }}
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@v4
       - name: Delete preview environment ${{ matrix.name }}
         uses: ./.github/actions/delete-preview

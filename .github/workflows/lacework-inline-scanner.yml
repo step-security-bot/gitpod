@@ -27,6 +27,11 @@ jobs:
       skip: ${{ steps.configuration.outputs.skip }}
       version: ${{ steps.configuration.outputs.version }}
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
       - name: "Set outputs"
         id: configuration
         run: |
@@ -54,6 +59,11 @@ jobs:
       image: eu.gcr.io/gitpod-core-dev/dev/dev-environment:aledbf-leeway-pigz-gha.18593
     steps:
       # Most of this is taken over from the Build workflow/preview-env-check-regressions workflow
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-environment
         with:
